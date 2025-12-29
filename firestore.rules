@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- Helper Functions ---
+    
+    // Check if user is logged in
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the user has the 'ADMIN' role in their database profile
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+
+    // --- Rules ---
+
+    // 1. USERS COLLECTION
+    // Users can read their own profile. Admins can read/write all.
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // 2. PUBLIC DATA (Menu, Categories, Toppings, Config, Deals)
+    // Public (or just staff) can READ. Only Admins can EDIT.
+    
+    match /menu/{document=**} {
+      allow read: if true; 
+      allow write: if isAdmin();
+    }
+    match /categories/{document=**} {
+      allow read: if true; 
+      allow write: if isAdmin();
+    }
+    match /toppings/{document=**} {
+      allow read: if true; 
+      allow write: if isAdmin();
+    }
+    match /deals/{document=**} {  // <--- ADDED THIS FOR YOUR DEALS PAGE
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /config/{document=**} {
+      allow read: if true; 
+      allow write: if isAdmin();
+    }
+
+    // 3. ORDERS
+    // Staff/Users can create and read orders.
+    match /orders/{orderId} {
+      allow create: if isAuthenticated(); // Any logged-in user
+      allow read, update: if isAuthenticated();
+      allow delete: if isAdmin(); // Only Admin can delete orders
+    }
+  }
+}

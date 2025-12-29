@@ -1,0 +1,5 @@
+{
+  "name": "SwyftPOS",
+  "description": "A modern, offline-capable Point of Sale system with inventory management, real-time analytics, and kitchen ticketing.",
+  "requestFramePermissions": []
+}
