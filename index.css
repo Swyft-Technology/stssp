@@ -5,6 +5,20 @@ body {
   color: #111827;
 }
 
+/* --- FULL SCREEN & SAFE AREA SUPPORT --- */
+body, #root {
+  /* Use 'dvh' (Dynamic Viewport Height) to account for mobile browser bars */
+  height: 100dvh; 
+  width: 100vw;
+  overflow: hidden; /* Prevent scrolling the whole app */
+  
+  /* Add padding for the "Safe Areas" (Notch/Home Bar) */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

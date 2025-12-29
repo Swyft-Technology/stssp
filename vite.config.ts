@@ -20,9 +20,18 @@ export default defineConfig(({ mode }) => {
             short_name: 'Swyft',
             description: 'Offline Capable POS System',
             theme_color: '#ffffff',
+            background_color: '#ffffff',
+            
+            // --- FULL SCREEN SETTINGS ---
+            display: 'standalone', 
+            orientation: 'landscape',
+            scope: '/',
+            start_url: '/',
+            // ---------------------------
+
             icons: [
               {
-                src: 'pwa-192x192.png', // Ensure you have these images in your public folder
+                src: 'pwa-192x192.png',
                 sizes: '192x192',
                 type: 'image/png'
               },
@@ -35,7 +44,7 @@ export default defineConfig(({ mode }) => {
           },
           workbox: {
             globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-            maximumFileSizeToCacheInBytes: 5000000 // Increase limit just in case
+            maximumFileSizeToCacheInBytes: 5000000 
           }
         })
       ],
