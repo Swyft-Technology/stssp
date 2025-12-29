@@ -17,7 +17,7 @@ export interface Topping {
   id: string;
   name: string;
   price: number; 
-  type: 'TOPPING' | 'SAUCE_OPTION' | 'BASE_OPTION' | 'SIDE' | 'OPTION'; 
+  type: 'TOPPING' | 'SAUCE_OPTION' | 'BASE_OPTION' | 'OPTION'; 
   available: boolean;
   availableSizes?: PizzaSize[];
 }
@@ -30,6 +30,7 @@ export interface SubItemConfig {
   allowCategories: string[]; // IDs of categories allowed to be selected
   forceSize?: PizzaSize; // e.g. Lunch special forces 'Small' pizza
   forceItemId?: string;
+  allowedItemIds?: string[];
 }
 
 export interface MenuItem {

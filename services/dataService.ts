@@ -1,7 +1,8 @@
 import { MenuItem, Order, Category, User, TenantConfig, Topping, UserRole } from '../types';
 import { DEFAULT_CONFIG } from '../constants';
 import { auth, db } from '../firebase';
-import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
+// UPDATE IMPORTS: Added 'onAuthStateChanged'
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { 
     collection, 
     getDocs, 
@@ -220,6 +221,43 @@ class DataService {
   }
 
   // --- Auth Methods (Firebase Auth) ---
+
+  // NEW METHOD: Listen for Persistent Auth State
+  public onAuthStateChange(callback: (user: User | null) => void) {
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // User is logged in! Fetch their role from Firestore
+        try {
+            const userDocRef = doc(db, 'users', firebaseUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            
+            if (userDoc.exists()) {
+                const userData = userDoc.data() as User;
+                callback({
+                    id: firebaseUser.uid,
+                    email: firebaseUser.email || '',
+                    name: userData.name || 'Staff Member',
+                    role: userData.role || UserRole.STAFF 
+                });
+            } else {
+                // Fallback if DB record is missing but Auth exists
+                callback({
+                    id: firebaseUser.uid,
+                    email: firebaseUser.email || '',
+                    name: firebaseUser.displayName || 'Staff Member',
+                    role: UserRole.STAFF 
+                });
+            }
+        } catch (e) {
+            console.error("Error fetching user profile", e);
+            callback(null);
+        }
+      } else {
+        // User is logged out
+        callback(null);
+      }
+    });
+  }
 
   public async login(email: string, password: string): Promise<User | null> {
     try {

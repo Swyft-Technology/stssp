@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, List, History, Tag } from 'lucide-react';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
-import { MenuManagement } from './MenuManagement';
+import { MenuManagement } from './menu/MenuManagement';
 import { OrderHistory } from './OrderHistory';
 import { DealsManagement } from './DealsManagement';
 

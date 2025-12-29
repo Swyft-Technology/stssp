@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { MenuItem, Topping, PizzaSize, SubItemSelection, SubItemConfig } from '../../types';
-// REPLACE useApp with useData
 import { useData } from '../../context/DataContext';
 import { Button } from '../ui/Button';
 import { X, Minus, Plus, Check, ArrowRight, ArrowLeft, Image as ImageIcon } from 'lucide-react';
@@ -12,16 +11,11 @@ interface ModifierModalProps {
 }
 
 export const ModifierModal: React.FC<ModifierModalProps> = ({ item, onClose, onConfirm }) => {
-  // Update Hook
   const { toppings, categories, menu, showImages } = useData();
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<PizzaSize | null>(null);
   
-  // ... (Rest of the file remains exactly the same. No logical changes needed.)
-  // Just update the imports and the hook on line 13.
-  // Copy everything below this line from your uploaded file.
   const [notes, setNotes] = useState('');
-  
   const [imgError, setImgError] = useState(false);
   
   // Modifiers State
@@ -44,15 +38,26 @@ export const ModifierModal: React.FC<ModifierModalProps> = ({ item, onClose, onC
 
   // --- Helpers ---
 
+  // UPDATED: Now respects the 'allowedItemIds' checkbox array
   const getAllowedItemsForConfig = useCallback((config: SubItemConfig) => {
-      if (config.forceItemId) {
-          const forced = menu.find(m => m.id === config.forceItemId);
-          return forced ? [forced] : [];
-      }
-      return menu.filter(m => 
+      // 1. Filter by Category first
+      let items = menu.filter(m => 
           config.allowCategories.includes(m.categoryId) && 
           m.itemType === 'SINGLE'
       );
+
+      // 2. Filter by Specific Allowed Items (If user checked specific boxes)
+      if (config.allowedItemIds && config.allowedItemIds.length > 0) {
+          items = items.filter(m => config.allowedItemIds!.includes(m.id));
+      }
+
+      // 3. Fallback for legacy "Force Item" (Keep purely for backward compatibility)
+      if (items.length > 1 && config.forceItemId) {
+          const forced = items.find(m => m.id === config.forceItemId);
+          if (forced) return [forced];
+      }
+
+      return items;
   }, [menu]);
 
   const isStepInteractive = useCallback((stepIndex: number) => {
